@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
   "use strict"
 
-  var links = document.querySelectorAll("a.scroll")
+  var links = document.querySelectorAll('a[class^="scroll"]')
   var i = links.length
   var root = /firefox|trident/i.test(navigator.userAgent) ? document.documentElement : document.body
   var easeInOutCubic = function(t, b, c, d) {
@@ -16,11 +16,13 @@ document.addEventListener("DOMContentLoaded", function() {
       var endPos = document.getElementById(/[^#]+$/.exec(this.href)[0]).getBoundingClientRect().top
       var maxScroll = root.scrollHeight - window.innerHeight
       var scrollEndValue = startPos + endPos < maxScroll ? endPos : maxScroll - startPos
-      var duration = 900
+      var options = /-(\d+)(-(\w+))?/.exec(this.className);
+      var duration = options ? Number(options[1]) : 900;
+      var easing = options && eval(options[3]) ? options[3] : "easeInOutCubic";
       var scroll = function(timestamp) {
         startTime = startTime || timestamp
         var elapsed = timestamp - startTime
-        var progress = easeInOutCubic(elapsed, startPos, scrollEndValue, duration)
+        var progress = eval(easing)(elapsed, startPos, scrollEndValue, duration)
         root.scrollTop = progress
         elapsed < duration && requestAnimationFrame(scroll)
       }   
